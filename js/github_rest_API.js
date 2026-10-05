@@ -1,6 +1,6 @@
 const ACCOUNT_1 = 'Megarukaza';
 const ACCOUNT_2 = 'GGMaas';
-const CACHE_DURATION_MS = 6 * 60 * 60 * 1000;
+const CACHE_DURATION_MS = 6 * 60 * 60 * 1000; //6 hours
 const RATE_LIMIT_RESET_KEY = 'github-api-rate-limit-reset';
 
 function readCache(key) {
