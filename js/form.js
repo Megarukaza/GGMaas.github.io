@@ -1,5 +1,5 @@
 const form = document.getElementById('contact-form');
-const messageSendFeedback = document.querySelector('#messageSendFeedback'); //Het bericht dat bij verzendknop staat
+const messageSendFeedback = document.querySelector('#messageSendFeedback'); 
 
 
 form.addEventListener('submit', async function(e) {
@@ -42,7 +42,7 @@ form.addEventListener('submit', async function(e) {
           messageSendFeedback.classList.remove('error');
           form.reset();
         } else {
-          messageSendFeedback.textContent = "Oops! Something went wrong. Try again.";
+          messageSendFeedback.textContent = "Oops Something went wrong. Try again.";
           messageSendFeedback.classList.add('error');
           messageSendFeedback.classList.remove('success');
         }
