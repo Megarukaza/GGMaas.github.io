@@ -5,7 +5,7 @@ async function getVisitorInfo() {
   const data = await response.json();
   
   if (data.status === 'fail') {
-    throw new Error('API kon geen IP-locatie ophalen');
+    throw new Error('API couldnt determine location');
   }
 
   return data; 
@@ -36,6 +36,18 @@ function buildVisitorWidget(info) {
   ipLabel.className = 'visitor-widget-label';
   ipLabel.textContent = 'Your special Public IP address';
 
+  const {ip, copyStatus } = copy_IP_ForUser(info);
+
+  const location = document.createElement('p');
+  location.className = 'visitor-widget-location';
+  location.textContent = `${info.city}, ${info.country}`;
+
+  ipDetails.append(ipLabel, ip, copyStatus);
+  container.append(buildWidgetHeading('You(r) visit'), ipDetails, location);
+  return container;
+}
+
+function copy_IP_ForUser(info) {
   const ip = document.createElement('button');
   ip.type = 'button';
   ip.className = 'visitor-widget-ip';
@@ -57,13 +69,7 @@ function buildVisitorWidget(info) {
     }
   });
 
-  const location = document.createElement('p');
-  location.className = 'visitor-widget-location';
-  location.textContent = `${info.city}, ${info.country}`;
-
-  ipDetails.append(ipLabel, ip, copyStatus);
-  container.append(buildWidgetHeading('You(r) visit'), ipDetails, location);
-  return container;
+  return { ip, copyStatus };
 }
 
 function buildVisitorStatus(titleText, message) {
