@@ -8,6 +8,7 @@ const create_collegeProject = (name, description, img, link, year) => ({
 });
 
 const projects = [
+
   create_collegeProject(
     "Security Center Operation",
     "Project is being worked on!",
@@ -63,15 +64,15 @@ function sortProjects(projectList, sortBy) {
   }
 
 
-function renderProjects(projectsList) {
+function renderProjects(projectsList, sortMethod) {
     const years_wrapper = document.getElementById('years-wrapper');
     if (!years_wrapper) return;
     
     const years = [...new Set(projectsList.map(p => p.year))];
 
-    years_wrapper.innerHTML = years.map(year => {
+    if (sortMethod === 'year-desc' || sortMethod === 'year-asc') {
+      years_wrapper.innerHTML = years.map(year => {
         const yearsProjects = projectsList.filter(p => p.year === year);
-
         return `
         <div class="year-block">
         <h3 class="year-title">Year ${year}</h3>
@@ -90,37 +91,85 @@ function renderProjects(projectsList) {
         </div>
       </div>
     `;
-    }).join('');
+
+      }).join('');
+    } else if (sortMethod === 'name-asc' || sortMethod === 'name-desc') {
+      const letters = [...new Set(projectsList.map(p => p.name.charAt(0).toUpperCase()))];
+      years_wrapper.innerHTML = `
+        ${letters.map(letter => `
+          <div class="letter-block">
+            <h3 class="letter-title">${letter}</h3>
+            <div class="projects-grid">
+              ${projectsList.filter(p => p.name.charAt(0).toUpperCase() === letter).map(p => `
+                <article class="project-card">
+                  <div class="project-image">
+                    <img src="${p.img}" loading="lazy" alt="Preview van ${p.name}" />
+                  </div>
+                  <div class="project-info">
+                    <h4>${p.name}</h4>
+                    <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check video</a>` : ''}
+                  </div>
+                </article>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+    } else if (sortMethod === 'random') {
+      years_wrapper.innerHTML = `
+        <div class="projects-grid">
+          ${projectsList.map(p => `
+            <article class="project-card">
+              <div class="project-image">
+                <img src="${p.img}" loading="lazy" alt="Preview van ${p.name}" />
+              </div>
+              <div class="project-info">
+                <h4>${p.name}</h4>
+                <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check video</a>` : ''}
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      `;
+    } 
 }
 
-const sortSelect = document.getElementById('sort-select');
+// ---------- DOM references ----------
+const sortSelect = document.getElementById('project-sort-select');
 const randomButton = document.getElementById('randomize-btn');
 
-function handleSort (value) {
+// ---------- Sorting & render logic ----------
+function sortAndRender(value) {
   const sortedData = sortProjects(projects, value);
-  renderProjects(sortedData);
+  renderProjects(sortedData, value);
 }
 
-handleSort('year-desc'); //initialisatie
+function toggleRandomButton(selectedValue) {
+  if (!randomButton) return;
 
+  if (selectedValue === 'random') {
+    randomButton.classList.remove('hidden');
+  } else {
+    randomButton.classList.add('hidden');
+  }
+}
+
+// ---------- Initial render ----------
+sortAndRender('year-desc');
+
+// ---------- Event listeners ----------
 if (sortSelect) {
-  sortSelect.addEventListener('change', (e) => {
-    const selectedValue = e.target.value;
+  sortSelect.addEventListener('change', (event) => {
+    const selectedValue = event.target.value;
 
-if (randomButton) {
-      if (selectedValue === 'random') {
-        randomButton.classList.remove('hidden');
-      } else {
-        randomButton.classList.add('hidden');
-      }
-    } 
-    handleSort(e.target.value);
+    toggleRandomButton(selectedValue);
+    sortAndRender(selectedValue);
   });
 }
 
 if (randomButton) {
   randomButton.addEventListener('click', () => {
-    handleSort('random'); 
+    sortAndRender('random');
   });
 }
 

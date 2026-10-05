@@ -10,6 +10,9 @@
     <script src="../js/lazyLoading.js" defer></script>
     <script src="../js/form.js" defer></script>
     <script src="../js/projects-data.js" defer></script>
+    <script src="../js/blog-data.js" defer></script>
+    <script src="../js/github_rest_API.js" defer></script>
+    <script src="../js/visitor_info_API.js" defer></script>
   </head>
 
   <body>
@@ -20,25 +23,58 @@
           <a href="#homepage" class="logo-name">
             Guido<span class="accent-text">vandermaas</span>
           </a>
+          <img
+            src="../img/Homepage1.jpg"
+            data-gif="../img/Homepage1.gif"
+            id="homepage-gif"
+            alt="Homepage gif depicting JS"
+          />
           <a href="#contact-form" class="contact-btn">Contact Me</a>
         </div>
 
         <div class="homepage-outerbox">
           <div class="homepage-box">
-            <img
-              src="../img/Homepage1.jpg"
-              data-gif="../img/Homepage1.gif"
-              id="homepage-gif"
-              alt="Homepage gif"
-            />
+            <section class="github-section">
+              <div class="github-intro">
+                <h2>Welcome</h2>
+                <p>
+                  These are my personal and school accounts. Visit a repository
+                  to explore one of my recent projects.
+                </p>
+              </div>
+              <div id="github-container" class="github-grid">
+                <div id="account-1-column" class="account-column">
+                  <div class="account-header">
+                    <h3>Main account</h3>
+                  </div>
+                  <p class="account-status" role="status">
+                    GitHub-account loading...
+                  </p>
+                </div>
+                <div id="account-2-column" class="account-column">
+                  <div class="account-header">
+                    <h3>School account</h3>
+                  </div>
+                  <p class="account-status" role="status">
+                    GitHub-account loading...
+                  </p>
+                </div>
+                <!-- github-rest_API.js will FILL the rest this up ;) -->
+              </div>
+            </section>
 
-            <nav class="nav-section">
-              <ul>
-                <li><a href="#about-me" class="orange-link">About me</a></li>
-                <li><a href="#projects" class="orange-link">Projects</a></li>
-                <li><a href="#blog" class="orange-link">Blog</a></li>
-              </ul>
-            </nav>
+            <div class="homepage-sidebar">
+              <nav class="nav-section">
+                <h2>Explore my portfolio</h2>
+                <ul>
+                  <li><a href="#about-me" class="orange-link">About me</a></li>
+                  <li><a href="#projects" class="orange-link">Projects</a></li>
+                  <li><a href="#blog" class="orange-link">Blog</a></li>
+                </ul>
+              </nav>
+
+              <div id="visitorInfo-widget-container"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -86,8 +122,10 @@
       <!-- SECTIE 3: PROJECTS -->
       <section class="screen-container" id="projects">
         <div class="filter-wrapper">
-          <label for="sort-select" class="sort-label">Sort projects:</label>
-          <select id="sort-select" class="sort-dropdown">
+          <label for="project-sort-select" class="sort-label"
+            >Sort projects:</label
+          >
+          <select id="project-sort-select" class="sort-dropdown">
             <option value="year-desc">Year (Newest first)</option>
             <option value="year-asc">Year (Oldest first)</option>
             <option value="name-asc">Name (A-Z)</option>
@@ -112,33 +150,17 @@
 
       <!-- SECTIE 4: BLOG -->
       <section class="screen-container" id="blog">
-        <div class="blog-timeline">
-          <article class="blog-card future-post">
-            <span class="blog-date">Future Update</span>
-            <h3>More Logs Coming Soon...</h3>
-            <p>
-              New articles and project reflections will be posted here as I
-              progress through my Software Engineering course.
-            </p>
-          </article>
-
-          <article class="blog-card">
-            <span class="blog-date">End-September 2026</span>
-            <h3>Improved my portfolio site</h3>
-            <p>
-              Added lazy loading to the images for better performance, also made
-              my site a bit more interactive with JavaScript.
-            </p>
-          </article>
-
-          <article class="blog-card">
-            <span class="blog-date">Begin-September 2026</span>
-            <h3>Building My Portfolio Website</h3>
-            <p>
-              Designing and implementing a modern black & orange themed
-              portfolio for WPFW using HTML, CSS, and JS.
-            </p>
-          </article>
+        <div class="filter-wrapper">
+          <label for="blog-sort-select" class="sort-label"
+            >Sort blog posts:</label
+          >
+          <select id="blog-sort-select" class="sort-dropdown">
+            <option value="date-desc">Newest</option>
+            <option value="date-asc">Oldest</option>
+          </select>
+        </div>
+        <div class="blog-timeline" id="blog-timeline">
+          <!-- Content will be filled by blog-data.js -->
         </div>
       </section>
 
@@ -147,22 +169,28 @@
         <form
           class="contact-form"
           id="contact-form"
+          aria-labelledby="contact-form-heading"
           action="https://formspree.io/f/moevpnlg"
           method="post"
         >
-          <h3>Contact <span class="accent-text">Me</span></h3>
+          <h3 id="contact-form-heading">
+            Contact <span class="accent-text">Me</span>
+          </h3>
 
           <label for="name">Name: </label>
           <input
             id="name"
             name="name"
+            required
             placeholder="The set of characters you use to identify yourself..."
           />
 
-          <label for="email">E-mail: </label>
+          <label for="e-mail">E-mail: </label>
           <input
             id="e-mail"
             name="e-mail"
+            type="email"
+            required
             placeholder="Don't worry, i ain't gonna spam you"
           />
 
@@ -170,11 +198,19 @@
           <textarea
             id="message"
             name="message"
+            required
             placeholder="But, if you decide to spam me, sleep with one eye open tonight.."
           ></textarea>
 
           <div class="post-wrapper">
-            <p id="messageSendFeedback">Send your message, ask me anything!</p>
+            <p
+              id="messageSendFeedback"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              Send your message, ask me anything!
+            </p>
             <button type="submit" class="submit-button">Send</button>
           </div>
         </form>
