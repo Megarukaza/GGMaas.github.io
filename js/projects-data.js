@@ -1,44 +1,25 @@
+// ---------- State ----------
+let projects = [];
 
-const create_collegeProject = (name, description, img, link, year) => ({
-  name,
-  description,
-  img,
-  link,
-  year
-});
+// ---------- Data ----------
+async function fetchProjects() {
+    const response = await fetch('http://localhost:5086/api/Projects');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch projects: ${response.status}`);
+    }
 
-const projects = [
-  
-  create_collegeProject(
-    "Security Center Operation",
-    "Project is being worked on!",
-    "../img/project3-preview.webp",
-    null,
-    2
-  ),
-  create_collegeProject(
-    "Unknown",
-    "Stay tuned?!",
-    "../img/project4-preview.webp",
-    null,
-    2
-  ),
-  create_collegeProject(
-    "Sustainable locker",
-    "A discreet locker designed to combat famine in the Netherlands",
-    "../img/project1-preview.webp",
-    "https://www.youtube.com/watch?v=v8YRUdYvR-w",
-    1
-  ),
-  create_collegeProject(
-    "Hotelator",
-    "A simple hotel simulation",
-    "../img/project2-preview.webp",
-    "https://www.youtube.com/watch?v=6V74E_lxJOQ",
-    1
-  )
-];
+    const data = await response.json();
 
+    return data.map(project => ({
+      name: project.name,
+      description: project.description,
+      year: project.year,
+      img: project.img,
+      link: project.link
+    }));
+}
+
+// ---------- Sorting ----------
 function sortProjects(projectList, sortBy) {
   const sorted = [...projectList];
 
@@ -61,9 +42,9 @@ function sortProjects(projectList, sortBy) {
     }
   }
     return sorted;
-  }
+}
 
-
+// ---------- Rendering ----------
 function renderProjects(projectsList, sortMethod) {
     const years_wrapper = document.getElementById('years-wrapper');
     if (!years_wrapper) return;
@@ -84,7 +65,7 @@ function renderProjects(projectsList, sortMethod) {
               </div>
               <div class="project-info">
                 <h4>${p.name}</h4>
-                <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check video</a>` : ''}
+                <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check it out</a>` : ''}
               </div>
             </article>
           `).join('')}
@@ -107,7 +88,7 @@ function renderProjects(projectsList, sortMethod) {
                   </div>
                   <div class="project-info">
                     <h4>${p.name}</h4>
-                    <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check video</a>` : ''}
+                    <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check it out</a>` : ''}
                   </div>
                 </article>
               `).join('')}
@@ -125,7 +106,7 @@ function renderProjects(projectsList, sortMethod) {
               </div>
               <div class="project-info">
                 <h4>${p.name}</h4>
-                <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check video</a>` : ''}
+                <p>${p.description}</p>${p.link ? `<a href="${p.link}" target="_blank" class="project-link">Check it out</a>` : ''}
               </div>
             </article>
           `).join('')}
@@ -134,14 +115,13 @@ function renderProjects(projectsList, sortMethod) {
     } 
 }
 
-// ---------- DOM references ----------
+// ---------- Controls and event handlers ----------
 const sortSelect = document.getElementById('project-sort-select');
 const randomButton = document.getElementById('randomize-btn');
 
-// ---------- Sorting & render logic ----------
-function sortAndRender(value) {
-  const sortedData = sortProjects(projects, value);
-  renderProjects(sortedData, value);
+function sortAndRender(sortMethod) {
+  const sortedProjects = sortProjects(projects, sortMethod);
+  renderProjects(sortedProjects, sortMethod);
 }
 
 function toggleRandomButton(selectedValue) {
@@ -154,24 +134,37 @@ function toggleRandomButton(selectedValue) {
   }
 }
 
-// ---------- Initial render ----------
-sortAndRender('year-desc');
+function handleSortChange(event) {
+  const sortMethod = event.target.value;
 
-// ---------- Event listeners ----------
-if (sortSelect) {
-  sortSelect.addEventListener('change', (event) => {
-    const selectedValue = event.target.value;
-
-    toggleRandomButton(selectedValue);
-    sortAndRender(selectedValue);
-  });
+  toggleRandomButton(sortMethod);
+  sortAndRender(sortMethod);
 }
 
-if (randomButton) {
-  randomButton.addEventListener('click', () => {
-    sortAndRender('random');
-  });
+function handleRandomClick() {
+  sortAndRender('random');
 }
 
+function setupEventListeners() {
+  if (sortSelect) {
+    sortSelect.addEventListener('change', handleSortChange);
+  }
 
+  if (randomButton) {
+    randomButton.addEventListener('click', handleRandomClick);
+  }
+}
 
+// ---------- Startup ----------
+async function init() {
+  setupEventListeners();
+
+  try {
+    projects = await fetchProjects();
+    sortAndRender('year-asc');
+  } catch (error) {
+    console.error('Error while loading projects:', error);
+  }
+}
+
+init();
